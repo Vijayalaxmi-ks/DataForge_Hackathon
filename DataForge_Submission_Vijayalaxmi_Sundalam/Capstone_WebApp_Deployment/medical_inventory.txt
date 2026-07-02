@@ -1,0 +1,101 @@
+Facility Name,Location,Oxygen Stock (Days),Antivenom Vials,Power Backup Status
+Pune Rural General Hospital,North Zone,14,22,4
+Nagpur Community Health Center,East Zone,3,5,1
+Nashik Sub-District Hospital,North Zone,18,19,5
+Amravati Primary Health Center,East Zone,2,2,2
+Thane Municipal Emergency Clinic,West Zone,15,24,3
+Solapur Public Dispensary,South Zone,8,12,4
+Kolhapur Area Trauma Unit,South Zone,12,17,5
+Aurangabad Welfare Clinic,Central Zone,4,6,1
+Jalgaon Regional Care Facility,North Zone,11,14,3
+Nanded Village Aid Station,Central Zone,2,1,2
+Satara Community Health Center,South Zone,16,21,4
+Sangli Local Medical Dispensary,South Zone,7,9,3
+Alibag Coastal Emergency Node,West Zone,3,4,1
+Ratnagiri Sub-District Unit,West Zone,14,20,5
+Sindhudurg Monsoon Care Camp,West Zone,2,3,2
+Latur District Support Ward,Central Zone,9,11,4
+Osmanabad Rural Health Post,Central Zone,4,7,1
+Beed Community Welfare Clinic,Central Zone,13,15,3
+Ahmednagar Referral Hospital,Central Zone,17,23,5
+Dhule Primary Health Station,North Zone,3,5,1
+Nandurbar Tribal Care Outpost,North Zone,2,2,2
+Bhiwandi Sub-Center Clinic,West Zone,10,13,4
+Kalyan Core Municipal Unit,West Zone,15,22,5
+Palghar Rural Emergency Ward,West Zone,4,4,1
+Panvel Urban Health Center,West Zone,12,18,3
+Karjat Foothills Dispensary,West Zone,2,1,1
+Chinchwad General Care Wing,North Zone,16,24,5
+Baramati Sub-District Hospital,South Zone,14,19,4
+Shirur Community Health Center,North Zone,5,8,2
+Indapur Village Relief Station,South Zone,3,4,1
+Khed Taluka General Ward,North Zone,11,15,3
+Manchar Emergency Medical Hub,North Zone,2,3,1
+Malegaon Municipal Care Unit,North Zone,13,21,4
+Deola Rural Dispensary Base,North Zone,4,6,1
+Kalwan Tribal Health Station,North Zone,2,2,2
+Igatpuri Heavy Rainfall Camp,North Zone,15,18,5
+Sinnar Industrial Area Ward,North Zone,9,12,3
+Trimbakeshwar Pilgrim Aid Post,North Zone,3,5,1
+Yeola Community Health Care,North Zone,12,14,4
+Chandrapur Thermal Node Clinic,East Zone,14,23,5
+Ballarpur Local Relief Wing,East Zone,4,7,1
+Bhadravati Community Center,East Zone,11,13,3
+Warora Rural Emergency Base,East Zone,2,3,2
+Gadchiroli Forest Outpost A,East Zone,1,2,1
+Aheri Remote Health Station,East Zone,3,4,1
+Chamorshi Village Dispensary,East Zone,10,11,3
+Gondia Border Medical Camp,East Zone,13,19,4
+Tirora Local Welfare Center,East Zone,5,6,1
+Amgaon Community Health Post,East Zone,2,1,2
+Bhandara District Core Unit,East Zone,16,22,5
+Tumsar Sub-District Wing,East Zone,8,12,3
+Pauni Rural Medical Base,East Zone,3,5,1
+Yavatmal Public Trauma Center,East Zone,15,20,4
+Pusad Taluka Care Facility,East Zone,4,8,1
+Umarkhed Local Relief Station,East Zone,11,15,3
+Wani Mining Sector Dispensary,East Zone,2,3,2
+Wardha Mahatma Medical Ward,East Zone,17,24,5
+Hinganghat Area Care Center,East Zone,9,11,4
+Arvi Rural Health Station,East Zone,3,4,1
+Akola Municipal Emergency Base,East Zone,14,19,4
+Murtizapur Community Clinic,East Zone,4,6,1
+Washim Rural District Ward,East Zone,12,16,3
+Risod Local Aid Station,East Zone,2,2,1
+Buldhana Hill Crest Hospital,East Zone,13,18,4
+Chikhli Sub-District Base,East Zone,5,7,2
+Khamgaon Core Medical Wing,East Zone,16,21,5
+Shegaon Pilgrim Welfare Post,East Zone,8,10,3
+Jalna Industrial Relief Unit,Central Zone,14,22,4
+Ambad Rural Community Center,Central Zone,3,5,1
+Bhokardan Village Aid Post,Central Zone,11,13,3
+Parbhani Core District Ward,Central Zone,2,2,2
+Gangakhed Local Health Base,Central Zone,15,19,4
+Hingoli Tribal Care Outpost,Central Zone,4,6,1
+Basmath Community Facility,Central Zone,12,15,3
+Kalamnuri Rural Medical Camp,Central Zone,2,1,1
+Miraj Medical College Wing,South Zone,18,25,5
+Tasgaon Grape Belt Dispensary,South Zone,9,13,4
+Vita Rural Emergency Node,South Zone,3,4,1
+Islampur Local Welfare Center,South Zone,13,17,3
+Ashta Village Health Post,South Zone,2,3,2
+Ichalkaranji Textile Ward,South Zone,15,22,5
+Jaysingpur Community Base,South Zone,5,8,1
+Gargoti Hill Station Clinic,South Zone,10,12,3
+Gadhinglaj Border Relief Camp,South Zone,3,5,1
+Pandharpur Pilgrim Care Unit,South Zone,16,24,4
+Mangalwedha Rural Aid Station,South Zone,4,6,1
+Barshi Sub-District Hospital,South Zone,12,19,3
+Kurduwadi Railway Junction Node,South Zone,2,2,2
+Karmala Local Emergency Post,South Zone,11,14,4
+Sangola Drought Resilience Ward,South Zone,4,5,1
+Karad Highway Trauma Base,South Zone,17,23,5
+Wai Foothills Emergency Post,South Zone,8,11,3
+Mahabaleshwar Tourist Care Camp,South Zone,3,4,1
+Phaltan Community Health Unit,South Zone,13,16,4
+Koregaon Rural Aid Station,South Zone,2,3,1
+Pen Central Logistics Hub,West Zone,14,20,4
+Roha Chemical Sector Ward,West Zone,5,7,1
+Mangaon Highway Emergency Post,West Zone,12,15,3
+Mahad Flood Vulnerability Base,West Zone,2,1,1
+Shrivardhan Coastal Care Camp,West Zone,11,18,4

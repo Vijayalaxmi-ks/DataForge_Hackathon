@@ -1,0 +1,6 @@
+DATASET ARCHITECTURE SUMMARY
+=======================================
+Rows Count    : 9709
+Columns Count : 20
+Memory Usage  : 1.4+ MB
+Key Columns   : Order ID, Order Date, Ship Date, Sales, Segment, Region

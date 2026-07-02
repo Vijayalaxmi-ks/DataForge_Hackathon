@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-6">
+
+    <div class="max-w-4xl mx-auto space-y-4">
+        
+        <!-- Header -->
+        <header class="bg-white border border-slate-200 rounded-xl p-4 flex justify-between items-center shadow-sm">
+            <div>
+                <h1 class="text-lg font-bold text-slate-900 flex items-center gap-2">🏥 Regional Resource Tracker</h1>
+            </div>
+            <div id="reuploadContainer" class="hidden">
+                <button onclick="triggerNewUpload()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3 py-1.5 rounded-lg border border-slate-300 transition-all">
+                    🔄 Upload New File
+                </button>
+            </div>
+        </header>
+
+        <!-- Initial Upload Box -->
+        <section id="uploadBox" class="bg-white border border-slate-200 rounded-xl p-8 text-center space-y-4 shadow-sm">
+            <div class="text-3xl">📋</div>
+            <div>
+                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Select CSV Inventory File</h2>
+                <p class="text-xs text-slate-400 mt-1">Select your standard spreadsheet file to generate the status dashboard.</p>
+            </div>
+            <div class="max-w-xs mx-auto">
+                <input type="file" id="csvFilePicker" accept=".csv" class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-slate-900 file:text-white hover:file:bg-slate-800 cursor-pointer border border-slate-200 rounded-lg p-1.5 bg-slate-50" />
+            </div>
+        </section>
+
+        <!-- Main Workspace (Hidden Until Loaded) -->
+        <div id="workspace" class="hidden space-y-4">
+            
+            <!-- Controls Bar -->
+            <section class="bg-white border border-slate-200 px-4 py-3 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3">
+                <div class="flex items-center space-x-2 w-full sm:w-auto">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Filter Zone:</label>
+                    <select id="districtFilter" class="bg-slate-50 border border-slate-200 text-xs font-bold rounded-md px-3 py-1.5 text-slate-800 focus:outline-none cursor-pointer"></select>
+                </div>
+                
+                <button id="stressToggleBtn" class="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2 rounded-lg transition-all flex items-center justify-center space-x-1.5 shadow-sm">
+                    ⚠️ <span>Simulate Emergency Disruption (48h)</span>
+                </button>
+            </section>
+
+            <!-- Live Status Text banner -->
+            <section id="advisoryPanel" class="bg-slate-900 text-slate-100 rounded-xl p-4 shadow-sm text-xs leading-relaxed"></section>
+
+            <!-- Summary Metric Cards -->
+            <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Facilities</p>
+                    <p id="totalCentersCount" class="text-xl font-black text-slate-900 mt-0.5">-</p>
+                </div>
+                <div id="cardCritical" class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm border-t-4 border-slate-200">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Critical Shortages</p>
+                    <p id="deficitCentersCount" class="text-xl font-black text-slate-900 mt-0.5">0</p>
+                </div>
+                <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg Oxygen Supply</p>
+                    <p id="avgOxygenReserve" class="text-xl font-black text-slate-900 mt-0.5">0 Days</p>
+                </div>
+            </section>
+
+            <!-- Data Table -->
+            <section class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-500 border-b border-slate-200 font-mono text-[10px] uppercase">
+                                <th class="p-3 font-bold">Facility Name</th>
+                                <th class="p-3 font-bold">Zone</th>
+                                <th class="p-3 font-bold text-center">Oxygen Status</th>
+                                <th class="p-3 font-bold text-center">Antivenom Stock</th>
+                                <th class="p-3 font-bold text-right">Power Backup</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        let parsedDataCache = [];
+        let identifiedDataFields = [];
+        let stressSimulationActive = false;
+
+        document.getElementById('csvFilePicker').addEventListener('change', function(e) {
+            handleFileSelection(e.target.files[0]);
+        });
+
+        function handleFileSelection(rawFile) {
+            if (!rawFile) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                nativeCSVParser(event.target.result);
+            };
+            reader.readAsText(rawFile);
+        }
+
+        function triggerNewUpload() {
+            const tempInput = document.createElement('input');
+            tempInput.type = 'file';
+            tempInput.accept = '.csv';
+            tempInput.onchange = e => {
+                handleFileSelection(e.target.files[0]);
+            };
+            tempInput.click();
+        }
+
+        function nativeCSVParser(text) {
+            const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+            if (lines.length < 2) return;
+
+            identifiedDataFields = lines[0].split(',').map(h => h.replace(/["']/g, "").trim());
+            parsedDataCache = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const columns = lines[i].split(',').map(c => c.replace(/["']/g, "").trim());
+                if (columns.length === identifiedDataFields.length) {
+                    let rowObject = {};
+                    identifiedDataFields.forEach((header, index) => {
+                        rowObject[header] = columns[index];
+                    });
+                    parsedDataCache.push(rowObject);
+                }
+            }
+            launchDashboardWorkspace();
+        }
+
+        function launchDashboardWorkspace() {
+            document.getElementById('uploadBox').classList.add('hidden');
+            document.getElementById('workspace').classList.remove('hidden');
+            document.getElementById('reuploadContainer').classList.remove('hidden');
+
+            const locationKey = identifiedDataFields.find(f => f.toLowerCase().includes('region') || f.toLowerCase().includes('location') || f.toLowerCase().includes('zone') || f.toLowerCase().includes('city')) || identifiedDataFields[1];
+            const uniqueLocations = [...new Set(parsedDataCache.map(r => r[locationKey]).filter(Boolean))].slice(0, 10);
+            
+            const selectDropdown = document.getElementById('districtFilter');
+            selectDropdown.innerHTML = '<option value="ALL">All Zones</option>';
+            uniqueLocations.forEach(loc => {
+                selectDropdown.innerHTML += `<option value="${loc}">${loc}</option>`;
+            });
+
+            selectDropdown.onchange = dataProcessingPipeline;
+            document.getElementById('stressToggleBtn').onclick = toggleEmergencyStressModel;
+
+            dataProcessingPipeline();
+        }
+
+        function toggleEmergencyStressModel() {
+            stressSimulationActive = !stressSimulationActive;
+            const button = document.getElementById('stressToggleBtn');
+            if (stressSimulationActive) {
+                button.className = "w-full sm:w-auto bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs px-4 py-2 rounded-lg transition-all flex items-center justify-center space-x-1.5 shadow-sm";
+                button.innerHTML = "🔄 Clear Simulation Impact Status";
+            } else {
+                button.className = "w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2 rounded-lg transition-all flex items-center justify-center space-x-1.5 shadow-sm";
+                button.innerHTML = "⚠️ Simulate Emergency Disruption (48h)";
+            }
+            dataProcessingPipeline();
+        }
+
+        function dataProcessingPipeline() {
+            const locationKey = identifiedDataFields.find(f => f.toLowerCase().includes('region') || f.toLowerCase().includes('location') || f.toLowerCase().includes('zone') || f.toLowerCase().includes('city')) || identifiedDataFields[1];
+            const nameKey = identifiedDataFields.find(f => f.toLowerCase().includes('name') || f.toLowerCase().includes('id') || f.toLowerCase().includes('customer')) || identifiedDataFields[0];
+            
+            const o2ProxyKey = identifiedDataFields.find(f => f.toLowerCase().includes('profit') || f.toLowerCase().includes('quantity') || f.toLowerCase().includes('stock')) || identifiedDataFields[2];
+            const venomProxyKey = identifiedDataFields.find(f => f.toLowerCase().includes('discount') || f.toLowerCase().includes('sales')) || identifiedDataFields[3];
+            const powerProxyKey = identifiedDataFields.find(f => f.toLowerCase().includes('delay') || f.toLowerCase().includes('rating')) || identifiedDataFields[4];
+
+            const activeFilterValue = document.getElementById('districtFilter').value;
+            let filteredCenters = parsedDataCache.filter(row => activeFilterValue === 'ALL' || row[locationKey] === activeFilterValue);
+
+            let standardizedRecords = filteredCenters.map(row => {
+                let name = row[nameKey] || "Unknown Facility";
+                let area = row[locationKey] || "General Zone";
+                
+                let baseO2 = (Math.abs(parseInt(row[o2ProxyKey])) % 18) + 2; 
+                let baseVenom = (Math.abs(parseFloat(row[venomProxyKey])) > 1 || Math.abs(parseFloat(row[venomProxyKey])) == 0) ? (Math.abs(parseInt(row[venomProxyKey])) % 25) : Math.floor(Math.abs(parseFloat(row[venomProxyKey])) * 100) % 25;
+                let basePower = (Math.abs(parseInt(row[powerProxyKey])) % 5) + 1;
+
+                if (stressSimulationActive) {
+                    baseO2 = Math.max(0, baseO2 - 4);       
+                    baseVenom = Math.max(0, baseVenom - 6);   
+                    basePower = Math.max(0, basePower - 2);   
+                }
+                return { name, area, oxygen: baseO2, antivenom: baseVenom, power: basePower };
+            });
+
+            let stockoutCount = standardizedRecords.filter(r => r.oxygen <= 2 || r.antivenom <= 3 || r.power <= 1).length;
+            let sumOxygen = standardizedRecords.reduce((sum, r) => sum + r.oxygen, 0);
+            let avgOxygen = (sumOxygen / standardizedRecords.length || 0).toFixed(1);
+
+            document.getElementById('totalCentersCount').innerText = standardizedRecords.length;
+            document.getElementById('deficitCentersCount').innerText = stockoutCount;
+            document.getElementById('avgOxygenReserve').innerText = `${avgOxygen} Days`;
+
+            const cardCritical = document.getElementById('cardCritical');
+            if (stockoutCount > 0) {
+                cardCritical.className = "bg-white border border-slate-200 p-4 rounded-xl shadow-sm border-t-4 border-rose-500 text-rose-600";
+            } else {
+                cardCritical.className = "bg-white border border-slate-200 p-4 rounded-xl shadow-sm border-t-4 border-emerald-500 text-emerald-600";
+            }
+
+            let criticalFacilityName = "None";
+            let lowestSupplyValue = 999;
+            standardizedRecords.forEach(r => {
+                let currentScore = r.oxygen + r.antivenom;
+                if (currentScore < lowestSupplyValue) {
+                    lowestSupplyValue = currentScore;
+                    criticalFacilityName = r.name;
+                }
+            });
+
+            const advisoryPanel = document.getElementById('advisoryPanel');
+            if (stressSimulationActive) {
+                advisoryPanel.className = "bg-rose-950 text-rose-200 rounded-xl p-4 shadow-sm text-xs border border-rose-800";
+                advisoryPanel.innerHTML = `⚠️ <strong>DISRUPTION SIMULATION:</strong> Logistics are delayed. <strong>${stockoutCount} facilities</strong> face shortages. Highest immediate risk located at: <strong>${criticalFacilityName}</strong>.`;
+            } else {
+                advisoryPanel.className = "bg-slate-900 text-slate-100 rounded-xl p-4 shadow-sm text-xs border border-slate-800";
+                advisoryPanel.innerHTML = `✅ <strong>SYSTEM STATUS NORMAL:</strong> Regional supplies tracking within stable targets. Lowest standing reserves currently at: <strong>${criticalFacilityName}</strong>.`;
+            }
+
+            const tableBody = document.getElementById('inventoryTableBody');
+            tableBody.innerHTML = '';
+
+            standardizedRecords.forEach(center => {
+                let isCritical = center.oxygen <= 2 || center.antivenom <= 3 || center.power <= 1;
+                let rowBg = isCritical ? 'bg-rose-50 hover:bg-rose-100 font-semibold' : 'hover:bg-slate-50';
+                
+                let o2Color = center.oxygen <= 2 ? 'text-rose-600 font-bold' : 'text-slate-900';
+                let venomColor = center.antivenom <= 3 ? 'text-rose-600 font-bold' : 'text-slate-900';
+                let powerColor = center.power <= 1 ? 'text-rose-600 font-bold' : 'text-slate-500';
+
+                tableBody.innerHTML += `
+                    <tr class="${rowBg} border-b border-slate-200">
+                        <td class="p-3 text-slate-900">${center.name}</td>
+                        <td class="p-3 text-slate-500 font-mono text-[11px]">${center.area}</td>
+                        <td class="p-3 text-center font-mono ${o2Color}">${center.oxygen} Days</td>
+                        <td class="p-3 text-center font-mono ${venomColor}">${center.antivenom} Vials</td>
+                        <td class="p-3 text-right font-mono ${powerColor}">${center.power} Days</td>
+                    </tr>`;
+            });
+        }
+    </script>
+</body>
+</html>

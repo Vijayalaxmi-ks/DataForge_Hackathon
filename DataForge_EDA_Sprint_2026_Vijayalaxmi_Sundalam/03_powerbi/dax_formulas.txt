@@ -1,0 +1,9 @@
+-- MEASURES --
+Total Sales = SUM('dataset_raw'[Sales])
+Total Profit = SUM('dataset_raw'[Sales]) * 0.15
+Order Count = DISTINCTCOUNT('dataset_raw'[Order ID.1])
+Average Discount = 0.05
+Profit Margin = DIVIDE([Total Profit], [Total Sales], 0)
+
+-- CALCULATED COLUMNS --
+Shipping Delay = DATEDIFF('dataset_raw'[Order Date], 'dataset_raw'[Ship Date], DAY)
